@@ -37,6 +37,9 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.1")
     implementation("com.h2database:h2:2.2.224")
     implementation("com.zaxxer:HikariCP:5.1.0")
+
+    // Password hashing
+    implementation("org.mindrot:jbcrypt:0.4")
 }
 
 application {

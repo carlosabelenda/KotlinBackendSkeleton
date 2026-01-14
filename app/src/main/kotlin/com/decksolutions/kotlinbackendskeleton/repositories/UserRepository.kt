@@ -74,12 +74,12 @@ class UserRepository {
     fun create(email: String, username: String, passwordHash: String): User {
         return transaction {
             // Verify email does not exist
-            if (UserEntity.find { Users.email eq email }.firstOrNull() != null) {
+            if (emailExists(email)) {
                 throw IllegalArgumentException("Email is already registered")
             }
 
             // Verify username does not exist
-            if (UserEntity.find { Users.username eq username }.firstOrNull() != null) {
+            if (usernameExists(username)) {
                 throw IllegalArgumentException("Username is already registered")
             }
 
