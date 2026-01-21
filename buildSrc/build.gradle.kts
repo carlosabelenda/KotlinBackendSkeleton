@@ -12,4 +12,6 @@ kotlin {
 dependencies {
     // Add a dependency on the Kotlin Gradle plugin, so that convention plugins can apply it.
     implementation(libs.kotlinGradlePlugin)
+    // Kover plugin for code coverage
+    implementation("org.jetbrains.kotlinx:kover-gradle-plugin:0.9.1")
 }

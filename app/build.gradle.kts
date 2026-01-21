@@ -11,6 +11,12 @@ kotlin {
     jvmToolchain(21)
 }
 dependencies {
+    // Security constraints for transitive dependencies
+    constraints {
+        implementation("io.netty:netty-codec-http:4.2.9.Final") // CVE-2025-67735
+        testImplementation("commons-codec:commons-codec:1.18.0") // Info disclosure fix
+    }
+
     // Ktor BOM (CRITICAL)
     implementation(platform("io.ktor:ktor-bom:3.3.3"))
 
@@ -40,6 +46,14 @@ dependencies {
 
     // Password hashing
     implementation("org.mindrot:jbcrypt:0.4")
+
+    // Testing (JUnit 4)
+    testImplementation("io.ktor:ktor-server-test-host")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.13")
+
 }
 
 application {
