@@ -7,6 +7,8 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin in JVM projects.
     kotlin("jvm")
+    // Apply Kover plugin for code coverage
+    id("org.jetbrains.kotlinx.kover")
 }
 
 kotlin {
@@ -15,8 +17,8 @@ kotlin {
 }
 
 tasks.withType<Test>().configureEach {
-    // Configure all test Gradle tasks to use JUnitPlatform.
-    useJUnitPlatform()
+    // Configure all test Gradle tasks to use JUnit 4.
+    useJUnit()
 
     // Log information about all test results, not only the failed ones.
     testLogging {
