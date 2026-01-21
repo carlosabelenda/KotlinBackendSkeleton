@@ -12,7 +12,7 @@ kotlin {
 }
 dependencies {
     // Ktor BOM (CRITICAL)
-    implementation(platform("io.ktor:ktor-bom:2.3.12"))
+    implementation(platform("io.ktor:ktor-bom:3.3.3"))
 
     // Project "app" depends on project "utils". (Project paths are separated with ":", so ":utils" refers to the top-level "utils" project.)
     implementation(project(":utils"))
@@ -35,8 +35,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.44.1")
     implementation("org.jetbrains.exposed:exposed-java-time:0.44.1")
     implementation("org.postgresql:postgresql:42.7.8")
-    implementation("com.h2database:h2:2.2.224")
-    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("com.h2database:h2:2.4.240")
+    implementation("com.zaxxer:HikariCP:7.0.2")
 
     // Password hashing
     implementation("org.mindrot:jbcrypt:0.4")
