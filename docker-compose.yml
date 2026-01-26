@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: kotlin-skeleton-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-kotlinskeletondb}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kotlin-skeleton-container
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-kotlinskeletondb}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_DRIVER: org.postgresql.Driver
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_ISSUER: ${JWT_ISSUER:-your-issuer}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-your-audience-target}
+
+    ports:
+      - "1234:1234"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
