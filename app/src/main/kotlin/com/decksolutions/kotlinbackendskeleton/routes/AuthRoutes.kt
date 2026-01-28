@@ -8,27 +8,19 @@ import com.decksolutions.kotlinbackendskeleton.models.responses.ErrorResponse
 import com.decksolutions.kotlinbackendskeleton.models.responses.UserResponse
 import com.decksolutions.kotlinbackendskeleton.services.AuthService
 import com.decksolutions.kotlinbackendskeleton.services.UserService
+import io.github.smiley4.ktoropenapi.delete
+import io.github.smiley4.ktoropenapi.post
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import org.slf4j.LoggerFactory
 
-
-/**
- * Authentication routes configuration
- *
- * @param userService User service
- * @param authService Authentication service
- */
 fun Application.configureAuthRoutes(
     userService: UserService,
     authService: AuthService
@@ -37,11 +29,33 @@ fun Application.configureAuthRoutes(
 
     routing {
         route("/api/auth") {
-            /**
-             * POST /api/auth/register
-             * Registers a new user
-             */
-            post("/register") {
+            post("/register", {
+                tags = listOf("Authentication")
+                summary = "Register new user"
+                description = "Creates a new user account and returns a JWT token"
+                request {
+                    body<RegisterRequest> {
+                        description = "User registration data"
+                        required = true
+                    }
+                }
+                response {
+                    HttpStatusCode.Created to {
+                        description = "User registered successfully"
+                        body<AuthResponse> {
+                            description = "JWT token and user data"
+                        }
+                    }
+                    HttpStatusCode.BadRequest to {
+                        description = "Invalid registration data or user already exists"
+                        body<ErrorResponse>()
+                    }
+                    HttpStatusCode.InternalServerError to {
+                        description = "Internal server error"
+                        body<ErrorResponse>()
+                    }
+                }
+            }) {
                 try {
                     val request = call.receive<RegisterRequest>()
 
@@ -53,7 +67,6 @@ fun Application.configureAuthRoutes(
                         password = request.password
                     )
 
-                    // Generate JWT token for the newly registered user
                     val (authenticatedUser, token) = authService.authenticate(
                         email = request.email,
                         password = request.password
@@ -91,11 +104,33 @@ fun Application.configureAuthRoutes(
                 }
             }
 
-            /**
-             * POST /api/auth/login
-             * Authenticates a user and returns a JWT token
-             */
-            post("/login") {
+            post("/login", {
+                tags = listOf("Authentication")
+                summary = "User login"
+                description = "Authenticates a user and returns a JWT token"
+                request {
+                    body<LoginRequest> {
+                        description = "Login credentials"
+                        required = true
+                    }
+                }
+                response {
+                    HttpStatusCode.OK to {
+                        description = "Login successful"
+                        body<AuthResponse> {
+                            description = "JWT token and user data"
+                        }
+                    }
+                    HttpStatusCode.Unauthorized to {
+                        description = "Invalid credentials"
+                        body<ErrorResponse>()
+                    }
+                    HttpStatusCode.InternalServerError to {
+                        description = "Internal server error"
+                        body<ErrorResponse>()
+                    }
+                }
+            }) {
                 try {
                     val request = call.receive<LoginRequest>()
 
@@ -132,23 +167,39 @@ fun Application.configureAuthRoutes(
                 }
             }
 
-            /**
-             * DELETE /api/auth/delete_user
-             * Deletes the authenticated user (can only delete themselves)
-             * Requires valid JWT authentication
-             */
             authenticate("auth-jwt") {
-                delete("/delete_user") {
+                delete("/delete_user", {
+                    tags = listOf("Authentication")
+                    summary = "Delete user"
+                    description = "Deletes the authenticated user account. Requires a valid JWT token."
+                    securitySchemeNames = listOf("JWT-Auth")
+                    response {
+                        HttpStatusCode.OK to {
+                            description = "User deleted successfully"
+                            body<DeleteUserResponse>()
+                        }
+                        HttpStatusCode.Unauthorized to {
+                            description = "Invalid or expired JWT token"
+                            body<ErrorResponse>()
+                        }
+                        HttpStatusCode.NotFound to {
+                            description = "User not found"
+                            body<ErrorResponse>()
+                        }
+                        HttpStatusCode.InternalServerError to {
+                            description = "Internal server error"
+                            body<ErrorResponse>()
+                        }
+                    }
+                }) {
                     try {
                         val principal = call.principal<JWTPrincipal>()
                             ?: throw IllegalStateException("Invalid JWT token")
 
-                        // Extract user ID from token
                         val userId = principal.payload.subject.toLong()
 
                         logger.info("Deletion request received for user ID: $userId")
 
-                        // Verify user exists
                         val user = userService.getUserById(userId)
                         if (user == null) {
                             logger.warn("Attempt to delete non-existent user: $userId")
@@ -159,7 +210,6 @@ fun Application.configureAuthRoutes(
                             return@delete
                         }
 
-                        // Delete user (can only delete themselves)
                         val deleted = userService.deleteUser(userId)
 
                         if (deleted) {

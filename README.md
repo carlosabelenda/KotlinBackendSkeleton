@@ -2,15 +2,15 @@
 
 A robust, production-ready backend skeleton built with **Kotlin** and **Ktor**. This project serves as a starting point for building RESTful APIs, featuring a layered architecture, database integration with Exposed (SQL mainly), and JWT-based authentication.
 
-## 🚀 Purpose
+## Purpose
 
 The goal of this project is to provide a clean, scalable, and easy-to-fork foundation for Kotlin backend development. It implements common patterns and best practices so developers can focus on business logic rather than boilerplate setup.
 
-## 🚧 Under construction
+## Under construction
 
 **Note: The initiative is still under construction and will be updated regularly. Be aware that the initial setup contains some known vulnerabilities**
 
-## 🏗 Architecture
+## Architecture
 
 The project follows a **Layered Architecture** (Controller-Service-Repository pattern) to ensure separation of concerns and testability:
 
@@ -24,24 +24,116 @@ The project follows a **Layered Architecture** (Controller-Service-Repository pa
     *   Located in: `com.decksolutions.kotlinbackendskeleton.models`
 
 ### Key Technologies
-*   **Language:** Kotlin (JVM 21)
-*   **Framework:** Ktor 2.x (Server)
-*   **Database:** PostgreSQL (it will be configurable soon)
-*   **ORM:** JetBrains Exposed
-*   **Connection Pool:** HikariCP
-*   **Authentication:** JWT (JSON Web Tokens) & BCrypt
-*   **Serialization:** Kotlinx Serialization
-*   **Build Tool:** Gradle (Kotlin DSL)
 
-## 📋 Prerequisites
+| Technology | Version | Description |
+|------------|---------|-------------|
+| **Kotlin** | 2.2.20 | Programming language |
+| **Ktor** | 3.3.3 | Web framework |
+| **JVM** | 21 | Runtime |
+| **PostgreSQL** | 15 | Database |
+| **Exposed** | 0.44.1 | ORM |
+| **HikariCP** | 7.0.2 | Connection pool |
+| **JWT** | - | Authentication |
+| **BCrypt** | 0.4 | Password hashing |
+| **Kotlinx Serialization** | - | JSON serialization |
+| **OpenAPI/Swagger** | 5.4.0 | API documentation |
 
-*   **JDK 21** or higher.
-*   **Docker** (for running the PostgreSQL database).
-*   **IntelliJ IDEA** (Recommended IDE).
+## Prerequisites
 
-## 🛠 Database Setup (Docker)
+*   **JDK 21** or higher
+*   **Docker & Docker Compose** (for containerized deployment)
+*   **IntelliJ IDEA** (Recommended IDE)
 
-You can spin up a PostgreSQL instance quickly using Docker. Run the following command in your terminal:
+## Quick Start with Docker Compose
+
+The easiest way to run the application is using Docker Compose, which starts both the PostgreSQL database and the backend application.
+
+```bash
+# Build and start all services
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Stop and remove volumes (deletes database data)
+docker-compose down -v
+```
+
+Once running, the application is available at:
+- **API**: http://localhost:1234
+- **Swagger UI**: http://localhost:1234/swagger
+- **OpenAPI Spec**: http://localhost:1234/openapi.json
+
+## API Documentation (OpenAPI/Swagger)
+
+The API is fully documented using OpenAPI 3.0 specification with interactive Swagger UI.
+
+### Accessing the Documentation
+
+| URL | Description |
+|-----|-------------|
+| `/swagger` | Interactive Swagger UI for testing endpoints |
+| `/openapi.json` | OpenAPI specification in JSON format |
+
+### Available Endpoints
+
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| `GET` | `/api/health_check` | System health status | No |
+| `POST` | `/api/auth/register` | Register new user | No |
+| `POST` | `/api/auth/login` | User login | No |
+| `DELETE` | `/api/auth/delete_user` | Delete authenticated user | JWT |
+| `GET` | `/echo` | Simple health endpoint | No |
+
+### JWT Authentication
+
+Protected endpoints require a valid JWT token in the `Authorization` header:
+
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+In Swagger UI, click the "Authorize" button and enter your token to test protected endpoints.
+
+## Configuration
+
+### Environment Variables
+
+The application is configured via environment variables. When using Docker Compose, default values are provided.
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `1234` |
+| `HOST` | Server host | `0.0.0.0` |
+| `DB_URL` | JDBC Connection URL | `jdbc:postgresql://postgres:5432/kotlinskeletondb` |
+| `DB_USER` | Database username | `postgres` |
+| `DB_PASSWORD` | Database password | `postgres` |
+| `DB_DRIVER` | Database driver class | `org.postgresql.Driver` |
+| `JWT_SECRET` | Secret key for signing tokens | `your-secret-key-change-in-production` |
+| `JWT_ISSUER` | Token issuer claim | `your-issuer` |
+| `JWT_AUDIENCE` | Token audience claim | `your-audience-target` |
+
+**Warning:** Change all default values before deploying to production!
+
+### Custom Configuration
+
+Create a `.env` file in the project root to override defaults:
+
+```env
+DB_NAME=mydb
+DB_USER=myuser
+DB_PASSWORD=mysecretpassword
+JWT_SECRET=my-production-secret-key
+JWT_ISSUER=my-app
+JWT_AUDIENCE=my-users
+```
+
+## Running Locally (Without Docker)
+
+### 1. Start PostgreSQL
 
 ```bash
 docker run --name kotlin-skeleton-db \
@@ -52,57 +144,75 @@ docker run --name kotlin-skeleton-db \
   -d postgres:15-alpine
 ```
 
-*   **User:** `postgres`
-*   **Password:** `postgres`
-*   **Database Name:** `kotlinskeletondb`
-*   **Port:** `5432`
-
-## ⚙️ Configuration (Environment Variables)
-
-The application is configured using `application.conf` which reads from Environment Variables. You must set these variables before running the application (e.g., in IntelliJ Run Configuration or your shell).
- 
-⚠️ **Note: Remember that this is just the foundation of a real backend system. In order to release this to production, you must change all these parameters.**
-
-| Variable | Description | Example Value |
-| :--- | :--- | :--- |
-| `PORT` | Server port | `1234` |
-| `HOST` | Server host | `0.0.0.0` |
-| `DB_URL` | JDBC Connection URL | `jdbc:postgresql://localhost:5432/kotlinskeletondb` |
-| `DB_USER` | Database username | `postgres` |
-| `DB_PASSWORD` | Database password | `postgres` |
-| `DB_DRIVER` | Database driver class | `org.postgresql.Driver` |
-| `JWT_SECRET` | Secret key for signing tokens | `my-super-secret-key` |
-| `JWT_ISSUER` | Token issuer claim | `kotlin-backend` |
-| `JWT_AUDIENCE` | Token audience claim | `backend-users` |
-
-## 🏃‍♂️ How to Run
-
-1.  Ensure your Docker database is running.
-2.  Set the Environment Variables listed above.
-3.  Run the application using Gradle:
+### 2. Set Environment Variables
 
 ```bash
-./gradlew run
+export DB_URL=jdbc:postgresql://localhost:5432/kotlinskeletondb
+export DB_USER=postgres
+export DB_PASSWORD=postgres
+export DB_DRIVER=org.postgresql.Driver
+export JWT_SECRET=my-secret-key
+export JWT_ISSUER=my-issuer
+export JWT_AUDIENCE=my-audience
+```
+
+### 3. Run the Application
+
+```bash
+./gradlew :app:run
 ```
 
 Or run the `main` function in `Application.kt` via IntelliJ IDEA.
 
-## 📡 API Usage Examples (CURL)
+## Testing
 
-Here are examples of how to interact with the API using `curl`.
+The project includes both unit tests and integration tests.
 
-### 1. Health Check
-Check if the server and database are running.
+### Running Tests
 
 ```bash
-curl -i -X GET http://localhost:1234/api/health_check
+# Run all tests
+./gradlew test
+
+# Run only app module tests
+./gradlew :app:test
+
+# Run tests with verbose output
+./gradlew test --info
 ```
 
-### 2. Register a User
-Create a new account.
+### Test Structure
+
+| Type | Location | Description |
+|------|----------|-------------|
+| Unit Tests | `app/src/test/kotlin/.../services/` | Service layer tests with mocked dependencies |
+| Integration Tests | `app/src/test/kotlin/.../repositories/` | Repository tests with H2 in-memory database |
+
+### Test Technologies
+
+- **JUnit 4** - Test framework
+- **MockK** - Mocking library for Kotlin
+- **H2 Database** - In-memory database for integration tests
+- **Ktor Test Host** - Testing Ktor applications
+
+### Example: Running a Specific Test
 
 ```bash
-curl -i -X POST http://localhost:1234/api/auth/register \
+./gradlew :app:test --tests "UserServiceTest"
+```
+
+## API Usage Examples (cURL)
+
+### Health Check
+
+```bash
+curl -X GET http://localhost:1234/api/health_check
+```
+
+### Register a User
+
+```bash
+curl -X POST http://localhost:1234/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -111,11 +221,10 @@ curl -i -X POST http://localhost:1234/api/auth/register \
   }'
 ```
 
-### 3. Login
-Authenticate and receive a JWT Token.
+### Login
 
 ```bash
-curl -i -X POST http://localhost:1234/api/auth/login \
+curl -X POST http://localhost:1234/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -127,30 +236,75 @@ curl -i -X POST http://localhost:1234/api/auth/login \
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": { user data}
+  "user": {
+    "id": 1,
+    "email": "user@example.com"
+  }
 }
 ```
 
-### 4. Delete User (Protected Route)
-Delete the currently authenticated user. Replace `<YOUR_TOKEN>` with the token received from login.
+### Delete User (Protected)
 
 ```bash
-curl -i -X DELETE http://localhost:1234/api/auth/delete_user \
+curl -X DELETE http://localhost:1234/api/auth/delete_user \
   -H "Authorization: Bearer <YOUR_TOKEN>"
 ```
 
-## 📂 Project Structure
+## Project Structure
 
 ```
-app/src/main/kotlin/com/decksolutions/kotlinbackendskeleton/
-├── Application.kt          # Entry point & DI wiring
-├── databases/              # Database configuration
-├── models/
-│   ├── entities/           # Database tables & Entity classes
-│   ├── requests/           # Request DTOs
-│   └── responses/          # Response DTOs
-├── repositories/           # Database access logic
-├── routes/                 # API Route definitions
-├── services/               # Business logic
-└── utils/                  # Utility classes
+KotlinBackendSkeleton/
+├── app/
+│   └── src/
+│       ├── main/kotlin/com/decksolutions/kotlinbackendskeleton/
+│       │   ├── Application.kt          # Entry point & DI wiring
+│       │   ├── config/                 # Configuration (OpenAPI)
+│       │   ├── databases/              # Database configuration
+│       │   ├── models/
+│       │   │   ├── entities/           # Database tables & Entity classes
+│       │   │   ├── requests/           # Request DTOs
+│       │   │   └── responses/          # Response DTOs
+│       │   ├── repositories/           # Database access logic
+│       │   ├── routes/                 # API Route definitions
+│       │   └── services/               # Business logic
+│       └── test/kotlin/                # Unit & Integration tests
+├── utils/                              # Shared utilities module
+├── docker-compose.yml                  # Docker Compose configuration
+├── Dockerfile                          # Multi-stage Docker build
+└── .dockerignore                       # Docker build exclusions
+```
+
+## Docker Configuration
+
+### Dockerfile
+
+The project uses a multi-stage build for optimized image size:
+
+1. **Build stage**: Uses `gradle:8.5-jdk21` to compile the application
+2. **Runtime stage**: Uses `eclipse-temurin:21-jre-alpine` for minimal runtime
+
+### Docker Compose Services
+
+| Service | Container Name | Port | Description |
+|---------|---------------|------|-------------|
+| `postgres` | kotlin-skeleton-db | 5432 | PostgreSQL database |
+| `backend` | kotlin-skeleton-container | 1234 | Ktor application |
+
+### Useful Docker Commands
+
+```bash
+# View running containers
+docker-compose ps
+
+# View backend logs
+docker-compose logs -f backend
+
+# Restart only backend (after code changes)
+docker-compose up -d --build backend
+
+# Access PostgreSQL CLI
+docker exec -it kotlin-skeleton-db psql -U postgres -d kotlinskeletondb
+
+# Remove all containers and volumes
+docker-compose down -v
 ```
