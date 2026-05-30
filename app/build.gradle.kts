@@ -35,6 +35,10 @@ dependencies {
     implementation("io.ktor:ktor-server-call-logging")
     implementation("io.ktor:ktor-server-status-pages")
 
+    // OpenAPI / Swagger UI
+    implementation("io.github.smiley4:ktor-openapi:5.4.0")
+    implementation("io.github.smiley4:ktor-swagger-ui:5.4.0")
+
     // Database
     implementation("org.jetbrains.exposed:exposed-core:0.44.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.44.1")
@@ -52,7 +56,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
     testImplementation("junit:junit:4.13.2")
-    testImplementation("io.mockk:mockk:1.13.13")
+    testImplementation("io.mockk:mockk:1.14.3")
 
 }
 
